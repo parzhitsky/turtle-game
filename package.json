@@ -1,0 +1,11 @@
+{
+  "name": "turtle-game",
+  "version": "1.0.0",
+  "description": "Educational programming game",
+  "scripts": {
+    "start": "serve ."
+  },
+  "devDependencies": {
+    "serve": "14.2.5"
+  }
+}
