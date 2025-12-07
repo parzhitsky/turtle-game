@@ -18,8 +18,11 @@ const speedSlider = document.getElementById('speed-slider')
 
 // Components
 const renderer = new Renderer(canvas, dinoElement)
-const commandInput = new CommandInput(inputElement, lineNumbersElement)
-const historyDisplay = new HistoryDisplay(historyContainer)
+const commandInput = new CommandInput(inputElement, lineNumbersElement, {
+  onEnter: handleRun
+})
+
+new HistoryDisplay(historyContainer)
 
 // Initial focus
 commandInput.focus()
@@ -38,7 +41,6 @@ const controlPanel = new ControlPanel({ runBtn, previewBtn, speedSlider }, {
 // Main Loop State
 let isAnimating = false
 let executionQueue = [] // Queue of tasks: { type: 'MOVE', ... } or { type: 'SET_COLOR' }
-let currentAnimation = null // { targetX, targetY, dx, dy, remainingDist }
 
 function handleRun() {
   if (isAnimating) return

@@ -1,7 +1,8 @@
 export class CommandInput {
-  constructor(inputElement, lineNumbersElement) {
+  constructor(inputElement, lineNumbersElement, callbacks = {}) {
     this.inputElement = inputElement
     this.lineNumbersElement = lineNumbersElement
+    this.onEnter = callbacks.onEnter
 
     this.init()
   }
@@ -9,7 +10,15 @@ export class CommandInput {
   init() {
     this.inputElement.addEventListener('input', () => this.updateLineNumbers())
     this.inputElement.addEventListener('scroll', () => this.syncScroll())
+    this.inputElement.addEventListener('keydown', (e) => this.handleKeydown(e))
     this.updateLineNumbers() // Initial state
+  }
+
+  handleKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (this.onEnter) this.onEnter()
+    }
   }
 
   getValue() {
