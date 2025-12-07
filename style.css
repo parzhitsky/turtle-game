@@ -105,11 +105,7 @@ body {
     flex: 1;
     overflow-y: auto;
     display: flex;
-    flex-direction: column-reverse; /* Bottom navigation, newest at bottom, but scrolled? 
-                                    Requirement: "displayed bottom-up (last events at bottom)".
-                                    column-reverse puts the 1st element at bottom.
-                                    Actually normal flex column + scroll to bottom is often easier, 
-                                    but let's see. If we append, they go to bottom. */
+    flex-direction: column;
     gap: 4px;
     font-family: 'Consolas', 'Monaco', monospace;
     font-size: 0.9rem;

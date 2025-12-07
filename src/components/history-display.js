@@ -8,14 +8,6 @@ export class HistoryDisplay {
 
   render() {
     this.container.innerHTML = ''
-    // "History displayed bottom-up (last events at bottom)"
-    // Since we store history with newest at index 0 (unshift), we should reverse it for display if we append children.
-    // OR flex-direction: column-reverse in CSS + simple append.
-
-    // Let's rely on array order. 
-    // If we want newest at the bottom visually in a normal flow:
-    // [Oldest, ..., Newest]
-    // State stores: [Newest, ..., Oldest]
 
     const history = [...state.commandHistory].reverse()
 
