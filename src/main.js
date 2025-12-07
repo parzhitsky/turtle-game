@@ -10,6 +10,7 @@ import { Direction, Config } from './constants.js'
 const canvas = document.getElementById('game-canvas')
 const dinoElement = document.getElementById('dino')
 const inputElement = document.getElementById('command-input')
+const lineNumbersElement = document.getElementById('line-numbers')
 const historyContainer = document.getElementById('history-list')
 const runBtn = document.getElementById('btn-run')
 const previewBtn = document.getElementById('btn-preview')
@@ -17,8 +18,11 @@ const speedSlider = document.getElementById('speed-slider')
 
 // Components
 const renderer = new Renderer(canvas, dinoElement)
-const commandInput = new CommandInput(inputElement)
+const commandInput = new CommandInput(inputElement, lineNumbersElement)
 const historyDisplay = new HistoryDisplay(historyContainer)
+
+// Initial focus
+commandInput.focus()
 
 // Control Panel & Speed
 let animationSpeed = Config.DEFAULT_SPEED // Pixels per second maybe?
@@ -51,6 +55,7 @@ function handleRun() {
 
   state.addCommandToHistory(text, true)
   commandInput.clear()
+  commandInput.focus()
 
   // Add commands to queue
   executionQueue = [...commands]

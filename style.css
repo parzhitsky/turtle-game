@@ -126,17 +126,45 @@ body {
     padding: var(--spacing-sm);
 }
 
+.command-input__wrapper {
+    display: flex;
+    height: 100%;
+    position: relative;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 1.1rem;
+    line-height: 1.5; /* Explicit line height for alignment */
+}
+
+.command-input__line-numbers {
+    width: 3rem;
+    text-align: right;
+    padding-right: var(--spacing-sm);
+    padding-top: var(--spacing-sm); /* Match textarea padding-top */
+    padding-bottom: var(--spacing-sm); /* Match textarea padding-bottom */
+    color: var(--color-text-secondary);
+    opacity: 0.5;
+    user-select: none;
+    background: rgba(0, 0, 0, 0.1);
+    border-right: 1px solid var(--color-border);
+    overflow: hidden; /* Hide scrollbar if any */
+    white-space: pre-wrap; /* Preserve newlines */
+}
+
 .command-input__textarea {
-    width: 100%;
+    flex: 1;
     height: 100%;
     background: transparent;
     border: none;
     color: var(--color-accent);
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 1.1rem;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
     resize: none;
     outline: none;
     padding: var(--spacing-sm);
+    overflow-y: scroll; /* Always show scrollbar to match sync */
+    white-space: pre; /* No wrapping to keep line numbers synced */
+    overflow-x: auto;
 }
 
 .command-input__textarea::placeholder {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="uk">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <script type="module" src="src/main.js" defer></script>
 </head>
+
 <body>
     <main class="app">
         <!-- Game Area (Top-Left) -->
@@ -25,12 +27,11 @@
 
         <!-- Command Input (Bottom-Left) -->
         <section class="app__input" id="command-input-section">
-            <textarea
-                class="command-input__textarea"
-                id="command-input"
-                placeholder="Введіть команди тут (наприклад: MOVE 100 RIGHT)..."
-                spellcheck="false"
-            ></textarea>
+            <div class="command-input__wrapper">
+                <div class="command-input__line-numbers" id="line-numbers">1</div>
+                <textarea class="command-input__textarea" id="command-input"
+                    placeholder="Введіть команди тут (наприклад: MOVE 100 RIGHT)..." spellcheck="false"></textarea>
+            </div>
         </section>
 
         <!-- Controls (Bottom-Right) -->
@@ -45,16 +46,10 @@
             </div>
             <div class="controls__speed">
                 <label for="speed-slider" class="controls__label">Швидкість</label>
-                <input
-                    type="range"
-                    id="speed-slider"
-                    min="1"
-                    max="100"
-                    value="50"
-                    class="controls__slider"
-                >
+                <input type="range" id="speed-slider" min="1" max="100" value="50" class="controls__slider">
             </div>
         </section>
     </main>
 </body>
+
 </html>
