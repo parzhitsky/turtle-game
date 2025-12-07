@@ -6,7 +6,9 @@ export const Direction = {
   DOWN: 'DOWN',
   DOWN_LEFT: 'DOWN_LEFT',
   LEFT: 'LEFT',
-  UP_LEFT: 'UP_LEFT'
+  UP_LEFT: 'UP_LEFT',
+  FORWARD: 'FORWARD',
+  BACK: 'BACK'
 }
 
 export const Config = {

@@ -14,6 +14,7 @@ const lineNumbersElement = document.getElementById('line-numbers')
 const historyContainer = document.getElementById('history-list')
 const runBtn = document.getElementById('btn-run')
 const previewBtn = document.getElementById('btn-preview')
+const directionBtn = document.getElementById('btn-toggle-direction')
 const speedSlider = document.getElementById('speed-slider')
 
 // Components
@@ -32,10 +33,13 @@ let animationSpeed = Config.DEFAULT_SPEED // Pixels per second maybe?
 // Actually prompt says "Speed slider controls animation speed".
 // Let's treat slider value 1-100 as a multiplier or raw speed.
 
-const controlPanel = new ControlPanel({ runBtn, previewBtn, speedSlider }, {
+const controlPanel = new ControlPanel({ runBtn, previewBtn, speedSlider, directionBtn }, {
   onRun: handleRun,
   onPreview: handlePreview,
-  onSpeedChange: (val) => { animationSpeed = val; }
+  onSpeedChange: (val) => { animationSpeed = val; },
+  onToggleDirection: () => {
+    renderer.toggleOverlay()
+  }
 })
 
 // Main Loop State
@@ -108,6 +112,10 @@ function executeCommandInstant(cmd) {
     const current = state.trailColor // Hex #RRGGBBAA
     const dim = current.substring(0, 7) + '00'
     state.setTrailColor(dim)
+  } else if (cmd.type === 'ROTATION_SET') {
+    state.updateAngle(cmd.resolvedAngle)
+  } else if (cmd.type === 'ROTATE') {
+    state.updateAngle(state.angle + cmd.resolvedAngle)
   } else if (cmd.type === 'MOVE') {
     cmd.steps.forEach(step => {
       // Apply full move
@@ -116,15 +124,22 @@ function executeCommandInstant(cmd) {
   }
 }
 
-function moveStepInstant(length, direction) {
-  // Calculate vector
+function getVectorFromDirection(direction, angle) {
   let dx = 0
   let dy = 0
-
-  // Diagonal factor = 1 / sqrt(2) approx 0.707
   const diag = 0.7071
 
-  // TODO: convert to a hash map
+  if (direction === 'FORWARD' || direction === 'BACK') {
+    const rad = (angle - 90) * (Math.PI / 180)
+    dx = Math.cos(rad)
+    dy = Math.sin(rad)
+    if (direction === 'BACK') {
+      dx = -dx
+      dy = -dy
+    }
+    return { dx, dy }
+  }
+
   switch (direction) {
     case Direction.UP: dy = -1; break
     case Direction.DOWN: dy = 1; break
@@ -135,6 +150,12 @@ function moveStepInstant(length, direction) {
     case Direction.DOWN_RIGHT: dx = diag; dy = diag; break
     case Direction.DOWN_LEFT: dx = -diag; dy = diag; break
   }
+  return { dx, dy }
+}
+
+function moveStepInstant(length, direction) {
+  // Calculate vector
+  const { dx, dy } = getVectorFromDirection(direction, state.angle)
 
   // Convert length (pixels) to normalized coords
   // We need renderer width/height to normalize 'length' pixels
@@ -192,6 +213,12 @@ function gameLoop(timestamp) {
       const dim = current.substring(0, 7) + '00'
       state.setTrailColor(dim)
       executionQueue.shift()
+    } else if (cmd.type === 'ROTATION_SET') {
+      state.updateAngle(cmd.resolvedAngle)
+      executionQueue.shift()
+    } else if (cmd.type === 'ROTATE') {
+      state.updateAngle(state.angle + cmd.resolvedAngle)
+      executionQueue.shift()
     } else if (cmd.type === 'MOVE') {
       // Check if we have steps remaining
       if (!cmd._currentStepIndex) cmd._currentStepIndex = 0
@@ -228,20 +255,7 @@ function gameLoop(timestamp) {
 }
 
 function applyMove(distPx, direction) {
-  let dx = 0
-  let dy = 0
-  const diag = 0.7071
-  // TODO: convert to a hash map
-  switch (direction) {
-    case Direction.UP: dy = -1; break
-    case Direction.DOWN: dy = 1; break
-    case Direction.LEFT: dx = -1; break
-    case Direction.RIGHT: dx = 1; break
-    case Direction.UP_RIGHT: dx = diag; dy = -diag; break
-    case Direction.UP_LEFT: dx = -diag; dy = -diag; break
-    case Direction.DOWN_RIGHT: dx = diag; dy = diag; break
-    case Direction.DOWN_LEFT: dx = -diag; dy = diag; break
-  }
+  const { dx, dy } = getVectorFromDirection(direction, state.angle)
 
   const normDX = (dx * distPx) / renderer.width
   const normDY = (dy * distPx) / renderer.height

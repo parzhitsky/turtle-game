@@ -14,6 +14,7 @@ class GameState {
     this.trails = [] // Array of {x1, y1, x2, y2, color} (normalized)
     this.isExecuting = false
     this.executionQueue = []
+    this.angle = 0 // Degrees, 0 is UP, Clockwise
     this.notifyChange()
   }
 
@@ -45,6 +46,10 @@ class GameState {
   updateDinoPosition(x, y) {
     this.dinoPosition = { x, y }
     // Don't notify on every frame usually, but for now ok
+  }
+
+  updateAngle(angle) {
+    this.angle = angle
   }
 
   addTrailSegment(x1, y1, x2, y2, color) {

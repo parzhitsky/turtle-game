@@ -1,9 +1,10 @@
 export class ControlPanel {
-  constructor({ runBtn, previewBtn, speedSlider }, callbacks) {
+  constructor({ runBtn, previewBtn, speedSlider, directionBtn }, callbacks) {
     this.runBtn = runBtn
     this.previewBtn = previewBtn
     this.speedSlider = speedSlider
-    this.callbacks = callbacks // { onRun, onPreview, onSpeedChange }
+    this.directionBtn = directionBtn
+    this.callbacks = callbacks // { onRun, onPreview, onSpeedChange, onToggleDirection }
 
     this.init()
   }
@@ -11,6 +12,7 @@ export class ControlPanel {
   init() {
     this.runBtn.addEventListener('click', () => this.callbacks.onRun())
     this.previewBtn.addEventListener('click', () => this.callbacks.onPreview())
+    this.directionBtn.addEventListener('click', () => this.callbacks.onToggleDirection())
 
     this.speedSlider.addEventListener('input', (e) => {
       this.callbacks.onSpeedChange(parseInt(e.target.value, 10))

@@ -8,6 +8,7 @@ export class Renderer {
     this.dino = dinoElement
     this.width = 0
     this.height = 0
+    this.showDirectionOverlay = false
 
     // Resize observer
     this.resizeObserver = new ResizeObserver(() => this.resize())
@@ -62,5 +63,44 @@ export class Renderer {
     const dinoPos = this.toPixels(state.dinoPosition.x, state.dinoPosition.y)
     this.dino.style.left = `${dinoPos.x}px`
     this.dino.style.top = `${dinoPos.y}px`
+
+    // Overlay
+    if (this.showDirectionOverlay) {
+      this.drawOverlay(dinoPos)
+    }
+  }
+
+  drawOverlay(center) {
+    const length = 50
+    const angleRad = (state.angle - 90) * (Math.PI / 180)
+    const dx = Math.cos(angleRad) * length
+    const dy = Math.sin(angleRad) * length
+
+    this.ctx.beginPath()
+    this.ctx.moveTo(center.x, center.y)
+    this.ctx.lineTo(center.x + dx, center.y + dy)
+    this.ctx.strokeStyle = 'red'
+    this.ctx.lineWidth = 2
+    this.ctx.stroke()
+
+    // Arrowhead
+    const headLen = 10
+    const angleLeft = angleRad - Math.PI / 6
+    const angleRight = angleRad + Math.PI / 6
+
+    this.ctx.beginPath()
+    this.ctx.moveTo(center.x + dx, center.y + dy)
+    this.ctx.lineTo(center.x + dx - Math.cos(angleLeft) * headLen, center.y + dy - Math.sin(angleLeft) * headLen)
+    this.ctx.stroke()
+
+    this.ctx.beginPath()
+    this.ctx.moveTo(center.x + dx, center.y + dy)
+    this.ctx.lineTo(center.x + dx - Math.cos(angleRight) * headLen, center.y + dy - Math.sin(angleRight) * headLen)
+    this.ctx.stroke()
+  }
+
+  toggleOverlay() {
+    this.showDirectionOverlay = !this.showDirectionOverlay
+    this.draw()
   }
 }

@@ -138,6 +138,36 @@ export function parse(input) {
           stack.push(newBlock)
         }
 
+      } else if (cmd === 'ROTATION_SET' || cmd === 'ROTATE') {
+        const args = []
+        let currentIdx = 1
+
+        // Parse up to 3 arguments
+        while (currentIdx < parts.length && args.length < 3) {
+          const arg = parts[currentIdx]
+          // If interpolation, we can't validate yet
+          if (isPotentialInterpolation(arg)) {
+            args.push(arg)
+          } else {
+            const val = parseFloat(arg)
+            if (!Number.isInteger(val)) {
+              throw new Error(`Invalid argument '${arg}' for ${cmd}. Must be an integer.`)
+            }
+            args.push(val)
+          }
+          currentIdx++
+        }
+
+        if (args.length === 0) {
+          throw new Error(`${cmd} requires at least 1 argument (degrees).`)
+        }
+
+        if (parts.length > currentIdx) {
+          throw new Error(`${cmd} accepts at most 3 arguments.`)
+        }
+
+        getCurrentBlock(stack).children.push({ type: cmd, args })
+
       } else {
         throw new Error(`Unknown command '${cmd}'.`)
       }
@@ -204,21 +234,24 @@ function flattenBlock(block, errors = []) {
             }
           } else if (cmd.type === 'MOVE') {
             for (const step of cmd.steps) {
-              if (typeof step.length === 'string') { // It might be a number if it wasn't interpolated
-                // We always need to try resolving if it looks like interpolation, 
-                // but here we know the parser only kept it as string if it started with {
-                // Wait, the parser keeps original string if isPotentialInterpolation is true.
-                // If it was already parsed as number, typeof is 'number'.
-                if (typeof step.length === 'string') {
-                  const resolved = resolveInterpolation(step.length)
-                  const val = parseFloat(resolved)
-                  if (isNaN(val)) {
-                    throw new Error(`Invalid resolved length '${resolved}'.`)
-                  }
-                  step.length = val
+              if (typeof step.length === 'string') {
+                const resolved = resolveInterpolation(step.length)
+                const val = parseFloat(resolved)
+                if (isNaN(val)) {
+                  throw new Error(`Invalid resolved length '${resolved}'.`)
                 }
+                step.length = val
               }
             }
+          } else if (cmd.type === 'ROTATION_SET' || cmd.type === 'ROTATE') {
+            const angle = resolveRotationArgs(cmd.args, errors)
+            if (angle !== null) {
+              // Replace args with single resolved angle for execution
+              cmd.resolvedAngle = angle
+              result.push(cmd)
+            }
+            // Don't push if angle is null (error occurred)
+            continue
           }
 
           result.push(cmd)
@@ -229,6 +262,34 @@ function flattenBlock(block, errors = []) {
     }
   }
   return result
+}
+
+function resolveRotationArgs(args, errors) {
+  const numericArgs = []
+  for (const arg of args) {
+    let val = arg
+    if (typeof arg === 'string' && arg.startsWith('{')) {
+      try {
+        const resolved = resolveInterpolation(arg)
+        val = parseFloat(resolved)
+        if (!Number.isInteger(val)) {
+          errors.push(`Invalid resolved argument '${resolved}'. Must be an integer.`)
+          return null
+        }
+      } catch (err) {
+        errors.push(`Error resolving argument: ${err.message}`)
+        return null
+      }
+    }
+    numericArgs.push(val)
+  }
+
+  // Calculate total degrees
+  let degrees = numericArgs[0]
+  if (numericArgs.length > 1) degrees += numericArgs[1] / 60
+  if (numericArgs.length > 2) degrees += numericArgs[2] / 3600
+
+  return degrees
 }
 
 function resolveInterpolation(text) {
