@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Code Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="src/main.js" defer></script>
+</head>
+<body>
+    <main class="app">
+        <!-- Game Area (Top-Left) -->
+        <section class="app__game-area" id="game-area">
+            <canvas id="game-canvas"></canvas>
+            <div class="app__dino" id="dino">🦖</div>
+        </section>
+
+        <!-- History (Top-Right) -->
+        <section class="app__history" id="history">
+            <h2 class="app__section-title">Історія команд</h2>
+            <div class="history__list" id="history-list">
+                <!-- History items will be injected here -->
+            </div>
+        </section>
+
+        <!-- Command Input (Bottom-Left) -->
+        <section class="app__input" id="command-input-section">
+            <textarea 
+                class="command-input__textarea" 
+                id="command-input" 
+                placeholder="Введіть команди тут (наприклад: MOVE 100 RIGHT)..."
+                spellcheck="false"
+            ></textarea>
+        </section>
+
+        <!-- Controls (Bottom-Right) -->
+        <section class="app__controls" id="controls">
+            <div class="controls__buttons">
+                <button class="btn btn--primary" id="btn-run" title="Запустити команду">
+                    ▶ Запуск
+                </button>
+                <button class="btn btn--secondary" id="btn-preview" title="Попередній перегляд">
+                    👁 Огляд
+                </button>
+            </div>
+            <div class="controls__speed">
+                <label for="speed-slider" class="controls__label">Швидкість</label>
+                <input 
+                    type="range" 
+                    id="speed-slider" 
+                    min="1" 
+                    max="100" 
+                    value="50" 
+                    class="controls__slider"
+                >
+            </div>
+        </section>
+    </main>
+</body>
+</html>

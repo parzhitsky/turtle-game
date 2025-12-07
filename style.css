@@ -1,0 +1,227 @@
+:root {
+    /* Colors */
+    --color-bg-main: #121212;
+    --color-bg-panel: rgba(30, 30, 30, 0.7);
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #aaaaaa;
+    --color-accent: #00ff88;
+    --color-accent-hover: #00cc6a;
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-input-bg: #1e1e1e;
+    
+    /* Spacing */
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+
+    /* Effects */
+    --backdrop-blur: 10px;
+    --border-radius: 12px;
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-bg-main);
+    color: var(--color-text-primary);
+    height: 100vh;
+    overflow: hidden; /* Fix viewport */
+}
+
+/* Main Layout: 2x2 Grid */
+.app {
+    display: grid;
+    grid-template-columns: 4fr 1fr; /* 80% 20% */
+    grid-template-rows: 4fr 1fr;    /* 80% 20% */
+    height: 100vh;
+    width: 100vw;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+}
+
+/* Sections Common Styles */
+.app__game-area,
+.app__history,
+.app__input,
+.app__controls {
+    background: var(--color-bg-panel);
+    border: 1px solid var(--color-border);
+    backdrop-filter: blur(var(--backdrop-blur));
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Game Area: Top-Left */
+.app__game-area {
+    position: relative;
+    /* Center the dino initially */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.app__dino {
+    font-size: 2rem;
+    position: absolute;
+    z-index: 2;
+    transform: translate(-50%, -50%); /* Centering anchor */
+    pointer-events: none;
+    transition: transform 0.1s linear; /* Smooth movement if needed, usually handled via JS requestAnimationFrame */
+}
+
+/* History: Top-Right */
+.app__history {
+    padding: var(--spacing-md);
+}
+
+.app__section-title {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-sm);
+}
+
+.history__list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse; /* Bottom navigation, newest at bottom, but scrolled? 
+                                    Requirement: "displayed bottom-up (last events at bottom)".
+                                    column-reverse puts the 1st element at bottom.
+                                    Actually normal flex column + scroll to bottom is often easier, 
+                                    but let's see. If we append, they go to bottom. */
+    gap: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+}
+
+.history-item {
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+}
+
+/* Input: Bottom-Left */
+.app__input {
+    padding: var(--spacing-sm);
+}
+
+.command-input__textarea {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: var(--color-accent);
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 1.1rem;
+    resize: none;
+    outline: none;
+    padding: var(--spacing-sm);
+}
+
+.command-input__textarea::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Controls: Bottom-Right */
+.app__controls {
+    padding: var(--spacing-md);
+    justify-content: space-between;
+}
+
+.controls__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.btn {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn--primary {
+    background: var(--color-accent);
+    color: #121212;
+}
+
+.btn--primary:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+}
+
+.btn--secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-primary);
+}
+
+.btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.app__controls:hover {
+    border-color: var(--color-accent);
+}
+
+.controls__speed {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.controls__label {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+.controls__slider {
+    width: 100%;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
