@@ -1,54 +1,59 @@
-import { Config } from './constants.js';
+import { Config } from './constants.js'
 
 class GameState {
+  handlers = []
+
   constructor() {
-    this.reset();
-    this.listeners = [];
+    this.reset()
   }
 
   reset() {
-    this.dinoPosition = { x: 0.5, y: 0.5 }; // Normalized coordinates (0.0 to 1.0)
-    this.trailColor = Config.DEFAULT_COLOR;
-    this.commandHistory = [];
-    this.trails = []; // Array of {x1, y1, x2, y2, color} (normalized)
-    this.isExecuting = false;
-    this.executionQueue = [];
-    this.notifyChange();
+    this.dinoPosition = { x: 0.5, y: 0.5 } // Normalized coordinates (0.0 to 1.0)
+    this.trailColor = Config.DEFAULT_COLOR
+    this.commandHistory = []
+    this.trails = [] // Array of {x1, y1, x2, y2, color} (normalized)
+    this.isExecuting = false
+    this.executionQueue = []
+    this.notifyChange()
   }
 
   // Observer pattern to update UI
-  subscribe(listener) {
-    this.listeners.push(listener);
+  subscribe(handler) {
+    this.handlers.push(handler)
   }
 
   notifyChange() {
-    this.listeners.forEach(l => l(this));
+    for (const handler of this.handlers) {
+      handler(this)
+    }
   }
 
   addCommandToHistory(commandText, success = true) {
     this.commandHistory.unshift({
       text: commandText,
       timestamp: Date.now(),
-      success
-    });
+      success,
+    })
+
     if (this.commandHistory.length > Config.MAX_HISTORY) {
-      this.commandHistory.pop();
+      this.commandHistory.pop()
     }
-    this.notifyChange();
+
+    this.notifyChange()
   }
 
   updateDinoPosition(x, y) {
-    this.dinoPosition = { x, y };
+    this.dinoPosition = { x, y }
     // Don't notify on every frame usually, but for now ok
   }
 
   addTrailSegment(x1, y1, x2, y2, color) {
-    this.trails.push({ x1, y1, x2, y2, color });
+    this.trails.push({ x1, y1, x2, y2, color })
   }
 
   setTrailColor(color) {
-    this.trailColor = color;
+    this.trailColor = color
   }
 }
 
-export const state = new GameState();
+export const state = new GameState()

@@ -7,7 +7,7 @@ export const Direction = {
   DOWN_LEFT: 'DOWN_LEFT',
   LEFT: 'LEFT',
   UP_LEFT: 'UP_LEFT'
-};
+}
 
 export const Config = {
   DEFAULT_COLOR: '#00ff88ff', // Greenish with full alpha
@@ -15,4 +15,4 @@ export const Config = {
   DEFAULT_SPEED: 50, // Steps per second (or similar metric)
   MAX_HISTORY: 100,
   DINO_SIZE: 10 // Virtual size for collisions/centering if needed
-};
+}
