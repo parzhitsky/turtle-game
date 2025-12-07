@@ -1,4 +1,4 @@
-import { Parser } from './parser.js'
+import { parse } from './parse.js'
 import { state } from './state.js'
 import { Renderer } from './renderer.js'
 import { CommandInput } from './components/command-input.js'
@@ -42,7 +42,7 @@ function handleRun() {
   const text = commandInput.getValue()
   if (!text.trim()) return
 
-  const { commands, errors } = Parser.parse(text)
+  const { commands, errors } = parse(text)
 
   if (errors.length > 0) {
     state.addCommandToHistory(`ERRORS:\n${errors.join('\n')}`, false)
@@ -68,7 +68,7 @@ function handlePreview() {
   // Let's interpret as "Instant Execution".
   if (isAnimating) return
   const text = commandInput.getValue()
-  const { commands, errors } = Parser.parse(text)
+  const { commands, errors } = parse(text)
   if (errors.length > 0) {
     state.addCommandToHistory(`PREVIEW ERROR: ${errors[0]}`, false)
     return
