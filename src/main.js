@@ -1,9 +1,9 @@
 import { parse } from './parse.js'
 import { state } from './state.js'
 import { Renderer } from './renderer.js'
-import { CommandInput } from './components/command-input.js'
-import { HistoryDisplay } from './components/history-display.js'
-import { ControlPanel } from './components/control-panel.js'
+import { CommandInput } from './command-input.js'
+import { HistoryDisplay } from './history-display.js'
+import { ControlPanel } from './control-panel.js'
 import { Direction, Config } from './constants.js'
 
 // DOM Elements
