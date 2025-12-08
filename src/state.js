@@ -1,6 +1,6 @@
 import { Config } from './constants.js'
 
-class GameState {
+class State {
   handlers = []
 
   constructor() {
@@ -61,4 +61,4 @@ class GameState {
   }
 }
 
-export const state = new GameState()
+export const state = new State()

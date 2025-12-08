@@ -16,5 +16,4 @@ export const Config = {
   TRAIL_WIDTH: 2,
   DEFAULT_SPEED: 50, // Steps per second (or similar metric)
   MAX_HISTORY: 100,
-  DINO_SIZE: 10 // Virtual size for collisions/centering if needed
 }
