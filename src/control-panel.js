@@ -1,18 +1,18 @@
 export class ControlPanel {
-  constructor({ runBtn, previewBtn, speedSlider, directionBtn }, callbacks) {
+  constructor({ runBtn, speedSlider, directionBtn, clearBtn }, callbacks) {
     this.runBtn = runBtn
-    this.previewBtn = previewBtn
     this.speedSlider = speedSlider
     this.directionBtn = directionBtn
-    this.callbacks = callbacks // { onRun, onPreview, onSpeedChange, onToggleDirection }
+    this.clearBtn = clearBtn
+    this.callbacks = callbacks // { onRun, onSpeedChange, onToggleDirection, onClear }
 
     this.init()
   }
 
   init() {
     this.runBtn.addEventListener('click', () => this.callbacks.onRun())
-    this.previewBtn.addEventListener('click', () => this.callbacks.onPreview())
     this.directionBtn.addEventListener('click', () => this.callbacks.onToggleDirection())
+    this.clearBtn.addEventListener('click', () => this.callbacks.onClear())
 
     this.speedSlider.addEventListener('input', (e) => {
       this.callbacks.onSpeedChange(parseInt(e.target.value, 10))
@@ -21,7 +21,7 @@ export class ControlPanel {
 
   setRunning(isRunning) {
     this.runBtn.disabled = isRunning
-    this.previewBtn.disabled = isRunning
+    this.clearBtn.disabled = isRunning
     this.runBtn.textContent = isRunning ? 'Виконується...' : '▶ Запуск'
   }
 }

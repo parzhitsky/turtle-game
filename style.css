@@ -111,10 +111,75 @@ body {
     font-size: 0.9rem;
 }
 
+/* History Item */
 .history-item {
+    position: relative;
     padding: 4px 8px;
     border-radius: 4px;
     background: rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    height: 32px;
+}
+
+.history-item.inactive {
+    opacity: 0.5;
+    color: var(--color-text-secondary);
+}
+
+.history-item__text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.history-item.expanded {
+    height: auto;
+    align-items: flex-start;
+}
+
+.history-item.expanded .history-item__text {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.history-item__actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.history-item:hover .history-item__actions {
+    opacity: 1;
+}
+
+.history-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--color-text-primary);
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-accent);
+}
+
+.history-btn.revert:hover {
+    color: #ffaa00;
 }
 
 /* Input: Bottom-Left */

@@ -13,9 +13,9 @@ const inputElement = document.getElementById('command-input')
 const lineNumbersElement = document.getElementById('line-numbers')
 const historyContainer = document.getElementById('history-list')
 const runBtn = document.getElementById('btn-run')
-const previewBtn = document.getElementById('btn-preview')
 const directionBtn = document.getElementById('btn-toggle-direction')
 const speedSlider = document.getElementById('speed-slider')
+const clearBtn = document.getElementById('btn-clear')
 
 // Components
 const renderer = new Renderer(canvas, dinoElement)
@@ -23,23 +23,20 @@ const commandInput = new CommandInput(inputElement, lineNumbersElement, {
   onEnter: handleRun
 })
 
-new HistoryDisplay(historyContainer)
+new HistoryDisplay(historyContainer, handleRevert, handleCopy)
 
 // Initial focus
 commandInput.focus()
 
 // Control Panel & Speed
-let animationSpeed = Config.DEFAULT_SPEED // Pixels per second maybe?
-// Actually prompt says "Speed slider controls animation speed".
-// Let's treat slider value 1-100 as a multiplier or raw speed.
-
-const controlPanel = new ControlPanel({ runBtn, previewBtn, speedSlider, directionBtn }, {
+let animationSpeed = Config.DEFAULT_SPEED
+const controlPanel = new ControlPanel({ runBtn, speedSlider, directionBtn, clearBtn }, {
   onRun: handleRun,
-  onPreview: handlePreview,
   onSpeedChange: (val) => { animationSpeed = val; },
   onToggleDirection: () => {
     renderer.toggleOverlay()
-  }
+  },
+  onClear: handleClearInput
 })
 
 // Main Loop State
@@ -68,28 +65,46 @@ function handleRun() {
   startAnimation()
 }
 
-function handlePreview() {
-  // "Dry Run" - Show end result without animation or just ghost?
-  // "Dry run essentially" usually means executing logic without side effects (or immediate state update).
-  // Prompt says "See command (dry run essentially)". 
-  // Maybe just run it instantly?
-  // "Controls interaction: 'view command' (dry run)". 
-  // Let's implement as instant execution (teleport) to show final state?
-  // Or maybe just validating?
-  // Let's interpret as "Instant Execution".
+function handleRevert(index) {
   if (isAnimating) return
-  const text = commandInput.getValue()
-  const { commands, errors } = parse(text)
-  if (errors.length > 0) {
-    state.addCommandToHistory(`PREVIEW ERROR: ${errors[0]}`, false)
-    return
-  }
 
-  // Execute instantly (make a copy of state if we wanted true dry run, but GameState is singleton here)
-  // We will just execute them instantly.
-  commands.forEach(cmd => {
-    executeCommandInstant(cmd)
+  // Revert BEFORE command at index.
+  state.setActiveCount(index)
+  restoreState()
+}
+
+function handleCopy(text) {
+  const current = commandInput.getValue()
+  if (current.trim()) {
+    if (!confirm('Replace current input?')) return
+  }
+  commandInput.setValue(text)
+  commandInput.focus()
+}
+
+function handleClearInput() {
+  const current = commandInput.getValue()
+  if (current.trim()) {
+    if (!confirm('Clear input?')) return
+  }
+  commandInput.clear()
+  commandInput.focus()
+}
+
+function restoreState() {
+  // Reset simulation state
+  state.reset()
+
+  // Re-execute active commands
+  // Active commands are indices 0 to activeCount-1
+  const activeCommands = state.commandHistory.slice(0, state.activeCount)
+
+  activeCommands.forEach(item => {
+    if (!item.success) return
+    const { commands } = parse(item.text)
+    commands.forEach(cmd => executeCommandImmediately(cmd))
   })
+
   renderer.draw()
 }
 
@@ -105,7 +120,7 @@ function stopAnimation() {
   controlPanel.setRunning(false)
 }
 
-function executeCommandInstant(cmd) {
+function executeCommandImmediately(cmd) {
   if (cmd.type === 'COLOR_SET') {
     state.setTrailColor(cmd.color)
   } else if (cmd.type === 'COLOR_UNSET') {
@@ -167,19 +182,7 @@ function moveStepInstant(length, direction) {
   let destY = state.dinoPosition.y + normDY
 
   // Add trail segments handling wrap
-  // Simple instant wrap logic:
-  // Just add start->dest. If dest wraps, math is complex to draw "instant" trail correctly 
-  // across boundary without intermediate points.
-  // For instant preview, maybe we don't draw trails? Or we do.
-  // Let's skip complex trail generation for preview to keep it simple, 
-  // OR we reuse the incremental logic but fast. 
-  // Ideally we reuse logic.
-
-  // Let's just update position for preview (teleport).
   state.updateDinoPosition((destX % 1 + 1) % 1, (destY % 1 + 1) % 1)
-
-  // Correct trail would require splitting.
-  // For simplicity, Preview just updates final position.
 }
 
 // Animation Variables
@@ -276,62 +279,6 @@ function applyMove(distPx, direction) {
   // Add trail segment
   if (!didWrap) {
     // Standard segment
-    state.addTrailSegment(state.dinoPosition.x, state.dinoPosition.y, newX, newY, state.trailColor)
-  } else {
-    // Wrapped.
-    // 1. Draw to edge (clamped). 
-    // This is tricky without exact intersection. 
-    // Simplification: Draw from start to (unwrapped) newX, newY BUT we need to handle drawing across canvas?
-    // No, we should draw to the edge.
-    // For now, let's just draw the segment to the "virtual" point off screen? No that won't show.
-    // We should draw: start -> edge.
-    // AND opposite edge -> wrapped.
-
-    // Complex intersection math:
-    // Or since we move small steps (frame by frame), we can just 'teleport' if the visual gap is small?
-    // If speed is high, gap is big.
-
-    // Let's just draw the trail to 'newX'/'newY' BUT renderer handles it?
-    // No renderer draws lines.
-    // Correct approach: Split segment.
-
-    // Because we are moving component-wise often (except diagonals),
-    // let's handle wrap simply by not drawing the cross-over line if dist is large?
-    // state.trails stores literal segments.
-    // If we just store (start, end), renderer draws line.
-
-    // If we wrap:
-    // Segment 1: start -> pre-wrap handled by logic?
-    // Ideally we clamp to 0 or 1.
-
-    // Let's use the 'teleport' logic: 
-    // If wrapping happens, we add NO trail for this frame? 
-    // Or we assume the step was small enough to just appear on other side?
-    // Providing a seamless trail requires calculating the exit point (0 or 1) and entry point (1 or 0).
-
-    // Given complexity and "educational game" nature, let's try to just ADD segment from start to newX/newY 
-    // EXCEPT if it spans more than 0.5 (wrap threshold).
-    // Renderer can implement: if (abs(x1-x2) > 0.5) don't draw or draw wrapping?
-
-    // Let's modify Renderer to handle wrapping lines!
-    // That is easier. If segment length > 0.5, assume wrap and don't draw (or draw two parts).
-  }
-
-  // Actually, let's just assume we add the segment as is (potentially out of bounds 0..1 or >1) 
-  // And let Renderer handle 0..1 modulo?
-  // No, state stores normalized.
-
-  // Simplest approach:
-  // Just add segment (start -> newX).
-  // If we wrapped, we actually just teleported.
-  // So update position.
-  // Don't add trail for the wrapping frame? 
-  // The visual artifact of missing 1 frame of trail at the edge is acceptable for MVP.
-  // Or we can clamp.
-
-  if (didWrap) {
-    // Gap in trail
-  } else {
     state.addTrailSegment(state.dinoPosition.x, state.dinoPosition.y, newX, newY, state.trailColor)
   }
 
