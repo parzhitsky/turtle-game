@@ -7,7 +7,7 @@ import { ControlPanel } from './control-panel.js'
 import { Direction, Config } from './constants.js'
 
 // DOM Elements
-const canvas = document.getElementById('game-canvas')
+const svg = document.getElementById('game-svg')
 const dinoElement = document.getElementById('dino')
 const inputElement = document.getElementById('command-input')
 const lineNumbersElement = document.getElementById('line-numbers')
@@ -18,7 +18,7 @@ const speedSlider = document.getElementById('speed-slider')
 const clearBtn = document.getElementById('btn-clear')
 
 // Components
-const renderer = new Renderer(canvas, dinoElement)
+const renderer = new Renderer(svg, dinoElement)
 const commandInput = new CommandInput(inputElement, lineNumbersElement, {
   onEnter: handleRun
 })
@@ -92,6 +92,9 @@ function handleClearInput() {
 }
 
 function restoreState() {
+  // Clear SVG trail elements
+  renderer.clearTrails()
+
   // Reset simulation state
   state.reset()
 
@@ -278,8 +281,9 @@ function applyMove(distPx, direction) {
 
   // Add trail segment
   if (!didWrap) {
-    // Standard segment
-    state.addTrailSegment(state.dinoPosition.x, state.dinoPosition.y, newX, newY, state.trailColor)
+    const trail = { x1: state.dinoPosition.x, y1: state.dinoPosition.y, x2: newX, y2: newY, color: state.trailColor }
+    const element = renderer.addTrailElement(trail)
+    state.addTrailSegment(trail.x1, trail.y1, trail.x2, trail.y2, trail.color, element)
   }
 
   state.updateDinoPosition(wrappedX, wrappedY)

@@ -14,6 +14,7 @@ class State {
     this.trailColor = Config.DEFAULT_COLOR
     // this.commandHistory = [] // History is persistent across internal resets
     this.trails = [] // Array of {x1, y1, x2, y2, color} (normalized)
+    this.trailElements = [] // SVG <line> elements for DOM manipulation
     this.isExecuting = false
     this.executionQueue = []
     this.angle = 0 // Degrees, 0 is UP, Clockwise
@@ -68,8 +69,9 @@ class State {
     this.angle = angle
   }
 
-  addTrailSegment(x1, y1, x2, y2, color) {
+  addTrailSegment(x1, y1, x2, y2, color, element) {
     this.trails.push({ x1, y1, x2, y2, color })
+    this.trailElements.push(element)
   }
 
   setTrailColor(color) {

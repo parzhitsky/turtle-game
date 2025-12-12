@@ -68,7 +68,7 @@ body {
     justify-content: center;
 }
 
-#game-canvas {
+#game-svg {
     position: absolute;
     top: 0;
     left: 0;
