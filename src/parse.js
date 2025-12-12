@@ -198,14 +198,17 @@ function getCurrentBlock(stack) {
 function flattenBlock(block, errors = []) {
   const result = []
 
-  let repeatCount = block.repeat
+  // Stack to track blocks to process: { block, iterationNumber }
+  // We'll process blocks depth-first to maintain proper command order
+  const stack = []
 
-  // Resolve repeat count if it's an interpolation
-  if (typeof repeatCount === 'string') {
+  // Resolve the root block's repeat count first
+  let rootRepeatCount = block.repeat
+  if (typeof rootRepeatCount === 'string') {
     try {
-      const resolved = resolveInterpolation(repeatCount)
-      repeatCount = parseFloat(resolved)
-      if (!Number.isInteger(repeatCount) || repeatCount < 0) {
+      const resolved = resolveInterpolation(rootRepeatCount)
+      rootRepeatCount = parseFloat(resolved)
+      if (!Number.isInteger(rootRepeatCount) || rootRepeatCount < 0) {
         errors.push(`Invalid resolved repeat amount '${resolved}'. Must be a non-negative integer.`)
         return []
       }
@@ -215,16 +218,48 @@ function flattenBlock(block, errors = []) {
     }
   }
 
-  for (let i = 0; i < repeatCount; i++) {
-    for (const child of block.children) {
+  // Initialize stack with root block iterations (in reverse order for correct processing)
+  for (let i = rootRepeatCount - 1; i >= 0; i--) {
+    stack.push({ block, iterationNumber: i })
+  }
+
+  // Process stack iteratively
+  while (stack.length > 0) {
+    const { block: currentBlock, iterationNumber } = stack.pop()
+
+    // Process this block's children for this specific iteration
+    // We need to process children in reverse order since we're using a stack
+    for (let childIdx = currentBlock.children.length - 1; childIdx >= 0; childIdx--) {
+      const child = currentBlock.children[childIdx]
+
       try {
         if (child.type === 'BLOCK') {
-          result.push(...flattenBlock(child, errors))
+          // Resolve the child block's repeat count
+          let childRepeatCount = child.repeat
+
+          if (typeof childRepeatCount === 'string') {
+            try {
+              const resolved = resolveInterpolation(childRepeatCount)
+              childRepeatCount = parseFloat(resolved)
+              if (!Number.isInteger(childRepeatCount) || childRepeatCount < 0) {
+                errors.push(`Invalid resolved repeat amount '${resolved}'. Must be a non-negative integer.`)
+                continue
+              }
+            } catch (err) {
+              errors.push(`Error resolving repeat amount: ${err.message}`)
+              continue
+            }
+          }
+
+          // Push child block iterations onto stack (in reverse order)
+          for (let i = childRepeatCount - 1; i >= 0; i--) {
+            stack.push({ block: child, iterationNumber: i })
+          }
         } else {
-          // Deep clone
+          // It's a command - clone and resolve it
           const cmd = JSON.parse(JSON.stringify(child))
 
-          // Resolve arguments for this specific iteration
+          // Resolve arguments for this command
           if (cmd.type === 'COLOR_SET') {
             if (typeof cmd.color === 'string' && cmd.color.startsWith('{')) {
               cmd.color = resolveInterpolation(cmd.color)
@@ -246,21 +281,22 @@ function flattenBlock(block, errors = []) {
           } else if (cmd.type === 'ROTATION_SET' || cmd.type === 'ROTATE') {
             const angle = resolveRotationArgs(cmd.args, errors)
             if (angle !== null) {
-              // Replace args with single resolved angle for execution
               cmd.resolvedAngle = angle
-              result.push(cmd)
+              // Since we're processing in reverse, prepend to result
+              result.unshift(cmd)
             }
-            // Don't push if angle is null (error occurred)
             continue
           }
 
-          result.push(cmd)
+          // Since we're processing in reverse order, prepend to result
+          result.unshift(cmd)
         }
       } catch (err) {
         errors.push(`Runtime error: ${err.message}`)
       }
     }
   }
+
   return result
 }
 
@@ -301,12 +337,8 @@ function resolveInterpolation(text) {
   let content = text.slice(1, -1).trim()
 
   // Find nested interpolations: {...}
-  // We need to resolve innermost first.
-  // We can look for the pattern { ... } where ... does not contain { or }
-  // OR we can just recurse.
-
-  // Simple approach: while there are opening brackets, find the FIRST closing bracket,
-  // find the matching opening bracket before it, resolve that chunk, replace and repeat.
+  // Process innermost first by finding the first closing bracket
+  // and its matching opening bracket before it.
 
   while (content.includes('{')) {
     const end = content.indexOf('}')
@@ -320,8 +352,11 @@ function resolveInterpolation(text) {
       throw new Error(`Mismatched brackets in interpolation '${text}'.`)
     }
 
-    const inner = content.substring(start, end + 1) // { ... }
-    const resolvedInner = resolveInterpolation(inner)
+    // Extract innermost pair: { ... }
+    const inner = content.substring(start, end + 1)
+    // Strip the braces and execute the printer command
+    const innerContent = inner.slice(1, -1).trim()
+    const resolvedInner = executePrinter(innerContent)
 
     content = content.substring(0, start) + resolvedInner + content.substring(end + 1)
   }
