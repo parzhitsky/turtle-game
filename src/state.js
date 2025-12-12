@@ -36,6 +36,13 @@ class State {
     // If we represent a "new branch" of history (activeCount < length),
     // we must discard the future commands.
     if (this.activeCount < this.commandHistory.length) {
+      // Hard delete: Remove trail elements from commands being discarded
+      for (let i = this.activeCount; i < this.commandHistory.length; i++) {
+        const command = this.commandHistory[i]
+        if (command.trailElements) {
+          command.trailElements.forEach(element => element.remove())
+        }
+      }
       // Keep indices 0 to activeCount-1
       this.commandHistory.length = this.activeCount
     }
@@ -44,6 +51,7 @@ class State {
       text: commandText,
       timestamp: Date.now(),
       success,
+      trailElements: [], // Track SVG line elements created by this command
     })
 
     this.activeCount = this.commandHistory.length
@@ -76,6 +84,15 @@ class State {
 
   setTrailColor(color) {
     this.trailColor = color
+  }
+
+  addTrailToCurrentCommand(trailElement) {
+    if (this.commandHistory.length > 0) {
+      const currentCommand = this.commandHistory[this.commandHistory.length - 1]
+      if (currentCommand.trailElements) {
+        currentCommand.trailElements.push(trailElement)
+      }
+    }
   }
 }
 

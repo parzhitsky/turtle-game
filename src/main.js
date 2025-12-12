@@ -68,8 +68,28 @@ function handleRun() {
 function handleRevert(index) {
   if (isAnimating) return
 
-  // Revert BEFORE command at index.
-  state.setActiveCount(index)
+  // Soft delete: Hide trail elements from commands after the revert point
+  for (let i = index + 1; i < state.commandHistory.length; i++) {
+    const command = state.commandHistory[i]
+    if (command.trailElements) {
+      command.trailElements.forEach(element => {
+        element.style.display = 'none'
+      })
+    }
+  }
+
+  // Show trail elements from commands up to and including the revert point
+  for (let i = 0; i <= index; i++) {
+    const command = state.commandHistory[i]
+    if (command.trailElements) {
+      command.trailElements.forEach(element => {
+        element.style.display = ''
+      })
+    }
+  }
+
+  // Revert to this point (keep this command and all before it).
+  state.setActiveCount(index + 1)
   restoreState()
 }
 
@@ -92,9 +112,6 @@ function handleClearInput() {
 }
 
 function restoreState() {
-  // Clear SVG trail elements
-  renderer.clearTrails()
-
   // Reset simulation state
   state.reset()
 
@@ -284,6 +301,7 @@ function applyMove(distPx, direction) {
     const trail = { x1: state.dinoPosition.x, y1: state.dinoPosition.y, x2: newX, y2: newY, color: state.trailColor }
     const element = renderer.addTrailElement(trail)
     state.addTrailSegment(trail.x1, trail.y1, trail.x2, trail.y2, trail.color, element)
+    state.addTrailToCurrentCommand(element) // Associate with current command
   }
 
   state.updateDinoPosition(wrappedX, wrappedY)
