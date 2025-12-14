@@ -3,7 +3,7 @@ import { Direction } from './parse-script/parse-command/move.command-parser.js'
 export function getVectorFromDirection(direction, angle) {
   let dx = 0
   let dy = 0
-  const diag = 0.7071
+  const diag = Math.SQRT1_2
 
   if (direction === Direction.FORWARD || direction === Direction.BACK) {
     const rad = (angle - 90) * (Math.PI / 180)

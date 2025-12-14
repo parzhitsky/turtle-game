@@ -16,14 +16,37 @@ export function applyMove(distPx, direction) {
   let wrappedY = newY
   let didWrap = false
 
-  if (newX < 0) { wrappedX = 1 + newX; didWrap = true }
-  if (newX > 1) { wrappedX = newX - 1; didWrap = true }
-  if (newY < 0) { wrappedY = 1 + newY; didWrap = true }
-  if (newY > 1) { wrappedY = newY - 1; didWrap = true }
+  if (newX < 0) {
+    wrappedX = 1 + newX
+    didWrap = true
+  }
+
+  if (newX > 1) {
+    wrappedX = newX - 1
+    didWrap = true
+  }
+
+  if (newY < 0) {
+    wrappedY = 1 + newY
+    didWrap = true
+  }
+
+  if (newY > 1) {
+    wrappedY = newY - 1
+    didWrap = true
+  }
+
 
   // Add trail segment
   if (!didWrap) {
-    const trail = { x1: state.dinoPosition.x, y1: state.dinoPosition.y, x2: newX, y2: newY, color: state.trailColor }
+    const trail = {
+      x1: state.dinoPosition.x,
+      y1: state.dinoPosition.y,
+      x2: newX,
+      y2: newY,
+      color: state.trailColor
+    }
+
     const element = addTrailElement(trail)
     state.addTrailSegment(trail.x1, trail.y1, trail.x2, trail.y2, trail.color, element)
     state.addTrailToCurrentCommand(element)
