@@ -1,5 +1,5 @@
-import { state } from '../state.js'
-import { moveStepInstant } from '../move-step-instant.js'
+import { state } from './state.js'
+import { moveStepInstant } from './move-step-instant.js'
 
 export function executeCommandImmediately(cmd) {
   if (cmd.type === 'COLOR_SET') {

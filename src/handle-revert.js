@@ -1,6 +1,6 @@
-import { parseScript } from '../parse-script/parse-script.js'
-import { draw } from '../renderer/renderer.js'
-import { state } from '../state.js'
+import { parseScript } from './parse-script/parse-script.js'
+import { draw } from './renderer/renderer.js'
+import { state } from './state.js'
 import { executeCommandImmediately } from './execute-command-immediately.js'
 
 function restoreState() {

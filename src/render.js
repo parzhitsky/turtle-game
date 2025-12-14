@@ -1,4 +1,4 @@
-import { state } from '../state.js'
+import { state } from './state.js'
 import { createHistoryItem } from './create-history-item.js'
 
 const container = document.getElementById('history-list')

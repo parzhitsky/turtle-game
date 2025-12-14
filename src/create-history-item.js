@@ -1,5 +1,5 @@
-import { state } from '../state.js'
-import { replaceScript } from '../script-input/replace-script.js'
+import { state } from './state.js'
+import { replaceScript } from './script-input/replace-script.js'
 import { handleRevert } from './handle-revert.js'
 
 export function createHistoryItem(item, index) {

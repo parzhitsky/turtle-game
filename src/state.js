@@ -1,4 +1,4 @@
-import { render } from './history-display/render.js'
+import { render } from './render.js'
 
 const DEFAULT_COLOR = '#00ff88ff'
 const MAX_HISTORY = 100
