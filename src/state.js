@@ -1,4 +1,7 @@
-import { Config } from './constants.js'
+import { render } from './history-display/render.js'
+
+const DEFAULT_COLOR = '#00ff88ff'
+const MAX_HISTORY = 100
 
 class State {
   handlers = []
@@ -11,7 +14,7 @@ class State {
 
   reset() {
     this.dinoPosition = { x: 0.5, y: 0.5 } // Normalized coordinates (0.0 to 1.0)
-    this.trailColor = Config.DEFAULT_COLOR
+    this.trailColor = DEFAULT_COLOR
     // this.commandHistory = [] // History is persistent across internal resets
     this.trails = [] // Array of {x1, y1, x2, y2, color} (normalized)
     this.trailElements = [] // SVG <line> elements for DOM manipulation
@@ -32,7 +35,9 @@ class State {
     }
   }
 
-  addCommandToHistory(commandText, success = true) {
+  addCommandToHistory(text, success = true) {
+    const now = Date.now()
+
     // If we represent a "new branch" of history (activeCount < length),
     // we must discard the future commands.
     if (this.activeCount < this.commandHistory.length) {
@@ -48,15 +53,15 @@ class State {
     }
 
     this.commandHistory.push({
-      text: commandText,
-      timestamp: Date.now(),
+      text,
+      timestamp: now,
       success,
       trailElements: [], // Track SVG line elements created by this command
     })
 
     this.activeCount = this.commandHistory.length
 
-    if (this.commandHistory.length > Config.MAX_HISTORY) {
+    if (this.commandHistory.length > MAX_HISTORY) {
       this.commandHistory.shift() // Remove oldest (index 0)
       this.activeCount--
     }
@@ -97,3 +102,5 @@ class State {
 }
 
 export const state = new State()
+
+state.subscribe(render)

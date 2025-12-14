@@ -10,10 +10,3 @@ export const Direction = {
   FORWARD: 'FORWARD',
   BACK: 'BACK'
 }
-
-export const Config = {
-  DEFAULT_COLOR: '#00ff88ff', // Greenish with full alpha
-  TRAIL_WIDTH: 2,
-  DEFAULT_SPEED: 50, // Steps per second (or similar metric)
-  MAX_HISTORY: 100,
-}

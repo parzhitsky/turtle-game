@@ -1,27 +1,30 @@
-export class ControlPanel {
-  constructor({ runBtn, speedSlider, directionBtn, clearBtn }, callbacks) {
-    this.runBtn = runBtn
-    this.speedSlider = speedSlider
-    this.directionBtn = directionBtn
-    this.clearBtn = clearBtn
-    this.callbacks = callbacks // { onRun, onSpeedChange, onToggleDirection, onClear }
+import { toggleOverlay } from './renderer/renderer.js'
+import { runScript } from './run-script.js'
+import { startAnimation } from './start-animation.js'
+import { getScript, clearInput, focusInput } from './script-input/script-input.js'
 
-    this.init()
+const runBtn = document.getElementById('btn-run')
+const directionBtn = document.getElementById('btn-toggle-direction')
+const speedSlider = document.getElementById('speed-slider')
+const clearBtn = document.getElementById('btn-clear')
+
+runBtn.addEventListener('click', runScript)
+directionBtn.addEventListener('click', toggleOverlay)
+clearBtn.addEventListener('click', () => {
+  if (getScript().trim() && !confirm('Clear input?')) {
+    return
   }
 
-  init() {
-    this.runBtn.addEventListener('click', () => this.callbacks.onRun())
-    this.directionBtn.addEventListener('click', () => this.callbacks.onToggleDirection())
-    this.clearBtn.addEventListener('click', () => this.callbacks.onClear())
+  clearInput()
+  focusInput()
+})
 
-    this.speedSlider.addEventListener('input', (e) => {
-      this.callbacks.onSpeedChange(parseInt(e.target.value, 10))
-    })
-  }
+speedSlider.addEventListener('input', (e) => {
+  startAnimation(parseInt(e.target.value, 10))
+})
 
-  setRunning(isRunning) {
-    this.runBtn.disabled = isRunning
-    this.clearBtn.disabled = isRunning
-    this.runBtn.textContent = isRunning ? 'Виконується...' : '▶ Запуск'
-  }
+export function setRunning(isRunning) {
+  runBtn.disabled = isRunning
+  clearBtn.disabled = isRunning
+  runBtn.textContent = isRunning ? 'Виконується...' : '▶ Запуск'
 }
