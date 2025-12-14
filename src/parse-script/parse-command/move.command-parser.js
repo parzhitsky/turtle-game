@@ -1,6 +1,18 @@
-import { Direction } from '../../direction.js'
 import { CommandParser } from './command-parser.abstract.js'
 import { isPotentialInterpolation } from './is-potential-interpolation.js'
+
+export const Direction = {
+  UP: 'UP',
+  UP_RIGHT: 'UP_RIGHT',
+  RIGHT: 'RIGHT',
+  DOWN_RIGHT: 'DOWN_RIGHT',
+  DOWN: 'DOWN',
+  DOWN_LEFT: 'DOWN_LEFT',
+  LEFT: 'LEFT',
+  UP_LEFT: 'UP_LEFT',
+  FORWARD: 'FORWARD',
+  BACK: 'BACK'
+}
 
 export class Move extends CommandParser {
   parse(parts, stack) {
