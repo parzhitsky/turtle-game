@@ -3,22 +3,26 @@ const MAX_HISTORY = 100
 
 class State {
   handlers = []
+  commandHistory = []
+  activeCount = 0
 
-  constructor() {
-    this.commandHistory = []
-    this.activeCount = 0
-    this.reset()
-  }
+  dinoPosition = { x: 0.5, y: 0.5 } // Normalized coordinates (0.0 to 1.0)
+  trailColor = DEFAULT_COLOR
+  trails = [] // Array of {x1, y1, x2, y2, color} (normalized)
+  trailElements = [] // SVG <line> elements for DOM manipulation
+  isExecuting = false
+  executionQueue = []
+  angle = 0 // Degrees, 0 is UP, Clockwise
 
   reset() {
-    this.dinoPosition = { x: 0.5, y: 0.5 } // Normalized coordinates (0.0 to 1.0)
+    this.dinoPosition.x = 0.5
+    this.dinoPosition.y = 0.5
     this.trailColor = DEFAULT_COLOR
-    // this.commandHistory = [] // History is persistent across internal resets
-    this.trails = [] // Array of {x1, y1, x2, y2, color} (normalized)
-    this.trailElements = [] // SVG <line> elements for DOM manipulation
+    this.trails.length = 0
+    this.trailElements.length = 0
     this.isExecuting = false
-    this.executionQueue = []
-    this.angle = 0 // Degrees, 0 is UP, Clockwise
+    this.executionQueue.length = 0
+    this.angle = 0
     this.notifyChange()
   }
 
