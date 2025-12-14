@@ -1,6 +1,6 @@
 import { applyMove } from './apply-move.js'
 import { setRunning } from './control-panel.js'
-import { draw } from './renderer/renderer.js'
+import { draw } from './renderer.js'
 import { state } from './state.js'
 
 // Module-level state for animation

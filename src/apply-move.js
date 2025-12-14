@@ -1,5 +1,5 @@
 import { state } from './state.js'
-import { addTrailElement, getHeight, getWidth } from './renderer/renderer.js'
+import { addTrailElement, getHeight, getWidth } from './renderer.js'
 import { getVectorFromDirection } from './get-vector-from-direction.js'
 
 export function applyMove(distPx, direction) {

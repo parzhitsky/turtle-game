@@ -1,5 +1,3 @@
-import { runScript } from '../run-script.js' // TODO: emit an event, subscribe to it in main.js
-
 const inputElement = document.getElementById('command-input')
 const lineNumbersElement = document.getElementById('line-numbers')
 
@@ -15,7 +13,7 @@ inputElement.addEventListener('scroll', () => {
 inputElement.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
-    runScript()
+    inputElement.form?.requestSubmit()
   }
 })
 

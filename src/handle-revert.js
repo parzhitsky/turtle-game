@@ -1,5 +1,5 @@
 import { parseScript } from './parse-script/parse-script.js'
-import { draw } from './renderer/renderer.js'
+import { draw } from './renderer.js'
 import { state } from './state.js'
 import { executeCommandImmediately } from './execute-command-immediately.js'
 

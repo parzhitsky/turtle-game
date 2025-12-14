@@ -1,27 +1,29 @@
-import { toggleOverlay } from './renderer/renderer.js'
-import { runScript } from './run-script.js'
-import { startAnimation } from './start-animation.js'
-import { getScript, clearInput, focusInput } from './script-input/script-input.js'
-
 const runBtn = document.getElementById('btn-run')
+const clearBtn = document.getElementById('btn-clear')
 const directionBtn = document.getElementById('btn-toggle-direction')
 const speedSlider = document.getElementById('speed-slider')
-const clearBtn = document.getElementById('btn-clear')
+const commandForm = document.getElementById('command-form')
 
-runBtn.addEventListener('click', runScript)
-directionBtn.addEventListener('click', toggleOverlay)
-clearBtn.addEventListener('click', () => {
-  if (getScript().trim() && !confirm('Clear input?')) {
-    return
-  }
+export function onRun(handleRun) {
+  commandForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+    handleRun()
+  })
+}
 
-  clearInput()
-  focusInput()
-})
+export function onToggleDirection(handleToggleDirection) {
+  directionBtn.addEventListener('click', handleToggleDirection)
+}
 
-speedSlider.addEventListener('input', (e) => {
-  startAnimation(parseInt(e.target.value, 10))
-})
+export function onClear(handleClear) {
+  clearBtn.addEventListener('click', handleClear)
+}
+
+export function onSpeedChange(handleSpeedChange) {
+  speedSlider.addEventListener('input', (e) => {
+    handleSpeedChange(parseInt(e.target.value, 10))
+  })
+}
 
 export function setRunning(isRunning) {
   runBtn.disabled = isRunning

@@ -1,5 +1,5 @@
 import { getVectorFromDirection } from './get-vector-from-direction.js'
-import { getHeight, getWidth } from './renderer/renderer.js'
+import { getHeight, getWidth } from './renderer.js'
 import { state } from './state.js'
 
 export function moveStepInstant(length, direction) {

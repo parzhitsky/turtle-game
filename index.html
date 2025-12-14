@@ -11,6 +11,9 @@
 
 <body>
     <main class="app">
+        <!-- Hidden logical form for command submission -->
+        <form id="command-form" style="display: none;"></form>
+
         <!-- Game Area (Top-Left) -->
         <section class="app__game-area" id="game-area">
             <svg id="game-svg" class="app__svg">
@@ -31,7 +34,7 @@
         <section class="app__input" id="command-input-section">
             <div class="command-input__wrapper">
                 <div class="command-input__line-numbers" id="line-numbers">1</div>
-                <textarea class="command-input__textarea" id="command-input"
+                <textarea class="command-input__textarea" id="command-input" form="command-form"
                     placeholder="Введіть команди тут (наприклад: MOVE 100 RIGHT)..." spellcheck="false"></textarea>
             </div>
             <div style="position: absolute; right: 10px; bottom: 10px;">
@@ -44,7 +47,7 @@
         <!-- Controls (Bottom-Right) -->
         <section class="app__controls" id="controls">
             <div class="controls__buttons">
-                <button class="btn btn--primary" id="btn-run" title="Запустити команду">
+                <button class="btn btn--primary" id="btn-run" title="Запустити команду" type="submit" form="command-form">
                     ▶ Запуск
                 </button>
                 <button class="btn btn--secondary" id="btn-toggle-direction" title="Показати/Приховати напрямок">

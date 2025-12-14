@@ -1,5 +1,3 @@
-import { render } from './render.js'
-
 const DEFAULT_COLOR = '#00ff88ff'
 const MAX_HISTORY = 100
 
@@ -104,5 +102,3 @@ class State {
 }
 
 export const state = new State()
-
-state.subscribe(render)
