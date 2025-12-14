@@ -45,7 +45,9 @@ class State {
       for (let i = this.activeCount; i < this.commandHistory.length; i++) {
         const command = this.commandHistory[i]
         if (command.trailElements) {
-          command.trailElements.forEach(element => element.remove())
+          for (const element of command.trailElements) {
+            element.remove()
+          }
         }
       }
       // Keep indices 0 to activeCount-1
