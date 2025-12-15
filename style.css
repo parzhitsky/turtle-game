@@ -185,6 +185,49 @@ body {
 /* Input: Bottom-Left */
 .app__input {
     padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+}
+
+.command-badges {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 8px;
+    padding-bottom: 4px;
+    /* Fade effect */
+    mask-image: linear-gradient(to right, 
+        transparent 0%, 
+        black 20px, 
+        black calc(100% - 20px), 
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(to right, 
+        transparent 0%, 
+        black 20px, 
+        black calc(100% - 20px), 
+        transparent 100%
+    );
+    /* Improve scrollbar hiding/styling if needed */
+    scrollbar-width: thin; 
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.badge:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--color-accent);
 }
 
 .command-input__wrapper {
@@ -211,7 +254,7 @@ body {
     white-space: pre-wrap; /* Preserve newlines */
 }
 
-.command-input__textarea {
+#script-input {
     flex: 1;
     height: 100%;
     background: transparent;
