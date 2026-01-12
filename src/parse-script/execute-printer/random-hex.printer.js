@@ -13,10 +13,10 @@ export class RandomHex extends Printer {
       arg = parseInt(args[0])
     }
 
-    const r = random()
-    const g = random()
-    const b = random()
-    const a = (arg !== undefined) ? Math.max(0, Math.min(255, arg)) : random()
+    const r = random(0x100)
+    const g = random(0x100)
+    const b = random(0x100)
+    const a = (arg !== undefined) ? Math.max(0, Math.min(0x100, arg)) : 0xFF
 
     return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(a)}`
   }
